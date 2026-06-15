@@ -1,26 +1,212 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b0e14;
+  --foreground: #e8ebf0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* ── Map beacons ───────────────────────────────────────────── */
+.beacon {
+  --c: var(--beacon-color, #f3c178);
+  position: relative;
+  width: 0;
+  height: 0;
+  cursor: pointer;
+}
+
+/* Vertical light shaft rising from the site */
+.beacon-beam {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 3px;
+  height: 84px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--c) 90%, transparent),
+    transparent
+  );
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  transform-origin: bottom center;
+  animation: beam-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Glowing core at ground level */
+.beacon-base {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  transform: translate(-50%, 50%);
+  background: var(--c);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--c) 28%, transparent),
+    0 0 14px 3px color-mix(in srgb, var(--c) 60%, transparent),
+    0 0 30px 8px color-mix(in srgb, var(--c) 35%, transparent);
+  animation: base-pulse 3s ease-in-out infinite;
+}
+
+/* Name + price chip, revealed on hover / selection */
+.beacon-chip {
+  position: absolute;
+  left: 50%;
+  bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  white-space: nowrap;
+  padding: 6px 11px;
+  border-radius: 12px;
+  background: rgba(16, 14, 34, 0.7);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, 8px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.beacon-chip-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+.beacon-chip-price {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c);
+}
+
+/* Compact name tag atop the beam — the label on the building */
+.beacon-tag {
+  position: absolute;
+  left: 50%;
+  bottom: 96px;
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+  background: rgba(16, 14, 34, 0.62);
+  border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+  backdrop-filter: blur(6px);
+  transform: translate(-50%, 6px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* Tag shows for headline projects always, and for everyone once zoomed in */
+.beacon.priority .beacon-tag,
+.beacon.show-tags .beacon-tag {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.beacon:hover .beacon-chip,
+.beacon.hover .beacon-chip,
+.beacon.selected .beacon-chip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* When the full card is showing, suppress the compact tag (rules after
+   the show rules so they win at equal specificity) */
+.beacon:hover .beacon-tag,
+.beacon.hover .beacon-tag,
+.beacon.selected .beacon-tag {
+  opacity: 0;
+}
+
+/* Selected beacon burns brighter and taller */
+.beacon.selected {
+  --c: #ffd591;
+  z-index: 5;
+}
+.beacon.selected .beacon-beam {
+  height: 110px;
+  width: 4px;
+}
+
+@keyframes beam-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    height: 84px;
+  }
+  50% {
+    opacity: 1;
+    height: 94px;
+  }
+}
+
+@keyframes base-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--c) 28%, transparent),
+      0 0 14px 3px color-mix(in srgb, var(--c) 60%, transparent),
+      0 0 30px 8px color-mix(in srgb, var(--c) 35%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px color-mix(in srgb, var(--c) 16%, transparent),
+      0 0 20px 5px color-mix(in srgb, var(--c) 48%, transparent),
+      0 0 40px 12px color-mix(in srgb, var(--c) 26%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beacon-beam,
+  .beacon-base {
+    animation: none;
+  }
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+  background: rgba(10, 12, 18, 0.5) !important;
+  color: rgba(255, 255, 255, 0.55);
+}
+.maplibregl-ctrl-attrib a {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* ── Showcase typography helpers ───────────────────────────── */
+.sc-display {
+  font-family: var(--sc-font-display, var(--font-inter));
+}
+.sc-body {
+  font-family: var(--sc-font-body, var(--font-inter));
+}
+
+::selection {
+  background: color-mix(in srgb, var(--sc-accent, #f5c66b) 70%, transparent);
+  color: var(--sc-accent-text, #0b0e14);
 }

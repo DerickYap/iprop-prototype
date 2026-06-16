@@ -672,6 +672,29 @@ export const projects: Project[] = [
       ],
     }),
   },
+
+  // ──────────── Bespoke flythrough (custom showcase, not sections) ────────────
+  // River Modern gets a map pin from this entry, but its showcase route renders
+  // the dedicated cinematic flythrough experience instead of ShowcaseRenderer —
+  // see src/app/projects/[slug]/page.tsx and src/components/showcase/river-modern/.
+  // `sections` is intentionally empty; it is unused for this slug.
+  {
+    slug: "river-modern",
+    name: "River Modern",
+    developer: "Meridian Group",
+    tagline: "A life that moves with the water",
+    lat: 1.3078,
+    lng: 103.872,
+    district: "D12 · Kallang Riverside",
+    region: "RCR",
+    priceFrom: 1_900_000,
+    tenure: "99-year leasehold",
+    top: "2030",
+    units: 320,
+    heroImage: "https://picsum.photos/seed/river-modern-cover/1400/1750",
+    themeId: "noir",
+    sections: [],
+  },
 ];
 
 export function getProject(slug: string): Project | undefined {

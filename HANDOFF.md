@@ -4,7 +4,7 @@
 > is and how it works** so it can be preserved as-is while work pivots in a
 > new direction. Nothing here is a TODO — it's the state of the build.
 
-_Last updated: 2026-06-15_
+_Last updated: 2026-06-16_
 
 ## What this is
 
@@ -113,6 +113,30 @@ the other five use a shared default template (`defaultSections()` in
   section.
 - Watten House, Parktown Residence, The Continuum, Pinetree Hill, The Chuan
   Park — default template.
+
+### River Modern — a 9th project with a *bespoke* showcase
+
+**River Modern** (Kallang Riverside) is the one project whose showcase does
+**not** go through the `sections[]` / `ShowcaseRenderer` system. It is a
+self-contained **cinematic flythrough**: a sticky full-screen `<video>` whose
+playhead is scrubbed by scroll, with six oversized copy "beats" fading in over
+the film. It lives in `src/components/showcase/river-modern/`
+(`RiverModernClient` → `RiverModernExperience` → `ScrubVideo` + `Overlay` +
+`Chrome`, reduced-motion `Fallback`), driven by `src/content/river-modern.ts`,
+with the clip at `public/river-modern/flythrough.mp4`.
+
+How it integrates:
+- It still has a normal `Project` entry in `projects.ts` (`themeId: "noir"`,
+  `sections: []`) — that's all the **map** needs for its tower cluster, beacon,
+  preview card and fly-in.
+- `src/app/projects/[slug]/page.tsx` **branches**: `slug === "river-modern"`
+  renders `<RiverModernClient/>` (client-only via `next/dynamic({ ssr:false })`);
+  every other slug renders `<ShowcaseRenderer/>` as before.
+- Uses the **Cormorant Garamond** display font (added in `app/layout.tsx` as
+  `--font-cormorant`). The `← Map` link in its `Chrome`/`Fallback` returns to the
+  map's eased camera-back-out.
+- Its imagery (`cover`/`poster`/`heroImage`) is **picsum.photos** placeholder, so
+  that host is whitelisted in `next.config.ts` `images.remotePatterns`.
 
 ## The map (`SingaporeMap.tsx`) — most custom part
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { projects, getProject } from "@/data/projects";
 import { ShowcaseRenderer } from "@/components/showcase/ShowcaseRenderer";
+import RiverModernClient from "@/components/showcase/river-modern/RiverModernClient";
 
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
@@ -33,5 +34,7 @@ export default async function ProjectPage({
   const { slug } = await params;
   const project = getProject(slug);
   if (!project) notFound();
+  // River Modern has a bespoke cinematic flythrough instead of the section system.
+  if (slug === "river-modern") return <RiverModernClient />;
   return <ShowcaseRenderer project={project} />;
 }

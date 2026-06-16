@@ -16,14 +16,43 @@ architecture, the data-driven section system, the map internals, theming, the
 scroll-video technique, and gotchas learned the hard way. **Read it before making
 changes.**
 
+## Prerequisites
+
+- **Node.js 20+** (LTS recommended) and **npm** — required by Next.js 16.
+- **Google Chrome** — only for the offline scripts in `scripts/` (frame
+  extraction + visual screenshots); `playwright-core` drives your system Chrome
+  rather than downloading a browser. Not needed to run the app.
+
 ## Getting started
 
 ```bash
-npm install
+npm install      # installs everything below
 npm run dev      # dev server on http://localhost:3000
 npm run build    # production build (also the basic TypeScript/static-gen gate)
 npm run start    # serve the production build
 ```
+
+`npm install` pulls every dependency from `package.json` — you don't need to
+install anything individually. For reference, the project depends on:
+
+### Runtime dependencies
+
+| Package | Version | Used for |
+|---|---|---|
+| `next` | 16.2.9 | App Router framework |
+| `react` / `react-dom` | 19.2.4 | UI runtime |
+| `maplibre-gl` | ^5.24.0 | The 3D twilight map (keyless) |
+| `motion` | ^12.40.0 | Scroll / scroll-scrub / entrance animation |
+
+### Dev dependencies
+
+| Package | Version | Used for |
+|---|---|---|
+| `typescript` | ^5 | TypeScript |
+| `@types/node`, `@types/react`, `@types/react-dom` | ^20 / ^19 / ^19 | Type defs |
+| `tailwindcss`, `@tailwindcss/postcss` | ^4 | Tailwind CSS v4 (PostCSS plugin) |
+| `eslint`, `eslint-config-next` | ^9 / 16.2.9 | Linting |
+| `playwright-core` | ^1.60.0 | Offline scripts + visual verification (drives system Chrome) |
 
 There are no automated tests; verification is visual (see "Verifying changes" in
 [`HANDOFF.md`](./HANDOFF.md)). Deployable to Vercel as-is.

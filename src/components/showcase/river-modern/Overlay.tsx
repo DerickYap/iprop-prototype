@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { RiverModern } from "@/content/river-modern";
+import type { RiverModern } from "@/data/projects";
 
 /**
  * The 6 beats, layered over the film. Each beat's copy fades + lifts in as the

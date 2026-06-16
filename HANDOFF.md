@@ -122,7 +122,8 @@ self-contained **cinematic flythrough**: a sticky full-screen `<video>` whose
 playhead is scrubbed by scroll, with six oversized copy "beats" fading in over
 the film. It lives in `src/components/showcase/river-modern/`
 (`RiverModernClient` → `RiverModernExperience` → `ScrubVideo` + `Overlay` +
-`Chrome`, reduced-motion `Fallback`), driven by `src/content/river-modern.ts`,
+`Chrome`, reduced-motion `Fallback`), driven by the `riverModern` data + types
+(`RiverModern`/`RiverVideo`/`RiverBeat`) exported from `src/data/projects.ts`,
 with the clip at `public/river-modern/flythrough.mp4`.
 
 How it integrates:

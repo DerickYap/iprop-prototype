@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { RiverModern } from "@/content/river-modern";
+import type { RiverModern } from "@/data/projects";
 
 /* eslint-disable @next/next/no-img-element */
 /**

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import riverModern from "@/content/river-modern";
+import { riverModern } from "@/data/projects";
 import { useReducedMotion } from "./useReducedMotion";
 import { useScrollProgress } from "./useScrollProgress";
 import ScrubVideo from "./ScrubVideo";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { RiverVideo } from "@/content/river-modern";
+import type { RiverVideo } from "@/data/projects";
 
 /* eslint-disable @next/next/no-img-element */
 /**

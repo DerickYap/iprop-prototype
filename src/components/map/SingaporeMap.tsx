@@ -123,6 +123,15 @@ export function SingaporeMap() {
   const [selected, setSelected] = useState<Project | null>(null);
   const [entering, setEntering] = useState<Project | null>(null);
   const [ready, setReady] = useState(false);
+  // The global dock sits at the bottom of the top-level window, but is hidden
+  // when the map is embedded in the Home teaser iframe. Lift the map's bottom UI
+  // to clear the dock only when it's actually present (i.e. not embedded).
+  const [embedded, setEmbedded] = useState(false);
+  useEffect(() => {
+    setEmbedded(window.self !== window.top);
+  }, []);
+  // When the dock is present, the map's bottom UI must clear it.
+  const raised = !embedded;
   // Mirrors for the idle-drift loop (which runs in a once-only effect).
   const selectedRef = useRef<Project | null>(null);
   const enteringRef = useRef<Project | null>(null);
@@ -462,7 +471,17 @@ export function SingaporeMap() {
       essential: true,
     });
     window.setTimeout(() => setEntering(p), 1900);
-    window.setTimeout(() => router.push(`/projects/${p.slug}`), 2700);
+    const target = `/projects/${p.slug}`;
+    window.setTimeout(() => {
+      // When the map runs inside the Home teaser iframe, navigate the top-level
+      // window so the showcase takes the full page instead of loading inside the
+      // teaser. A direct /map visit (not embedded) uses normal SPA navigation.
+      if (window.self !== window.top && window.top) {
+        window.top.location.href = target;
+      } else {
+        router.push(target);
+      }
+    }, 2700);
   };
 
   return (
@@ -485,7 +504,12 @@ export function SingaporeMap() {
         }}
       />
 
-      <MapOverlay projects={projects} onPick={pickProject} hidden={!!entering} />
+      <MapOverlay
+        projects={projects}
+        onPick={pickProject}
+        hidden={!!entering}
+        raised={raised}
+      />
 
       <AnimatePresence>
         {selected && !entering && (
@@ -494,6 +518,7 @@ export function SingaporeMap() {
             project={selected}
             onClose={() => setSelected(null)}
             onEnter={() => enterShowcase(selected)}
+            raised={raised}
           />
         )}
       </AnimatePresence>

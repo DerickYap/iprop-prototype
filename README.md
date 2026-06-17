@@ -9,6 +9,14 @@ It's demo-quality: all data is static and imagery/video are placeholders. There 
 no backend, auth, or CMS. Built with Next.js 16 (App Router) + React 19, Tailwind
 CSS v4, MapLibre GL JS, and motion (Framer Motion).
 
+## Branches
+
+- **`main`** — the standalone 3D map as the homepage (the original version).
+- **`editorial-landing`** — an editorial reframe: a Home landing with an
+  interactive map teaser, a categorized **Journal** of articles, per-project
+  "Related reading", and a macOS-style dock (Home / Explore / Journal). See
+  [`HANDOFF.md`](./HANDOFF.md) → "Editorial layer".
+
 ## 📄 Start with the handoff doc
 
 **[`HANDOFF.md`](./HANDOFF.md) is the source of truth for how this project works** —

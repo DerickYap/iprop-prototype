@@ -12,10 +12,13 @@ export function MapOverlay({
   projects,
   onPick,
   hidden,
+  raised = false,
 }: {
   projects: Project[];
   onPick: (p: Project) => void;
   hidden: boolean;
+  /** Lift bottom-anchored UI above the global dock when it's on screen. */
+  raised?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [region, setRegion] = useState<"All" | Region>("All");
@@ -61,7 +64,9 @@ export function MapOverlay({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 40, opacity: 0 }}
             transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-            className="pointer-events-auto absolute top-17 right-5 bottom-5 flex w-[min(330px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#101420]/90 backdrop-blur-xl"
+            className={`pointer-events-auto absolute top-17 right-5 flex w-[min(330px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#101420]/90 backdrop-blur-xl ${
+              raised ? "bottom-28" : "bottom-5"
+            }`}
           >
             <div className="flex gap-1.5 p-3 pb-2">
               {REGIONS.map((r) => (

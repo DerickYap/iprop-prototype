@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import type { Project, Section } from "@/data/types";
 import { themes, themeStyle } from "@/lib/themes";
 import { ShowcaseNav } from "./ShowcaseNav";
+import { RelatedArticles } from "./RelatedArticles";
 import { HeroSection } from "./sections/HeroSection";
 import { StatementSection } from "./sections/StatementSection";
 import { GallerySection } from "./sections/GallerySection";
@@ -70,6 +71,8 @@ export function ShowcaseRenderer({ project }: { project: Project }) {
       <ShowcaseNav project={project} />
 
       {project.sections.map((s, i) => renderSection(s, project, i))}
+
+      <RelatedArticles slug={project.slug} />
 
       <footer
         className="border-t px-6 py-10 text-center"

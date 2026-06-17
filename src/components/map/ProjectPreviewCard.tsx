@@ -10,10 +10,13 @@ export function ProjectPreviewCard({
   project,
   onClose,
   onEnter,
+  raised = false,
 }: {
   project: Project;
   onClose: () => void;
   onEnter: () => void;
+  /** Lift above the global dock when it's on screen. */
+  raised?: boolean;
 }) {
   const theme = themes[project.themeId];
 
@@ -23,7 +26,9 @@ export function ProjectPreviewCard({
       animate={{ y: 0, x: "-50%", opacity: 1 }}
       exit={{ y: 48, x: "-50%", opacity: 0 }}
       transition={{ type: "spring", bounce: 0.18, duration: 0.55 }}
-      className="absolute bottom-5 left-1/2 z-20 w-[min(430px,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-white/10 bg-[#101420]/92 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+      className={`absolute left-1/2 z-20 w-[min(430px,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-white/10 bg-[#101420]/92 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl ${
+        raised ? "bottom-28" : "bottom-5"
+      }`}
     >
       <div className="relative h-44 w-full">
         <Image

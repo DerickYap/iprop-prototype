@@ -4,15 +4,24 @@
 > is and how it works** so it can be preserved as-is while work pivots in a
 > new direction. Nothing here is a TODO — it's the state of the build.
 
-_Last updated: 2026-06-16_
+_Last updated: 2026-06-17_
+
+> **Branch note:** This is the **`editorial-landing`** branch — it reframes the
+> app as an editorial product (Home / Explore / Journal + a dock). The original
+> **standalone 3D map as the homepage lives on `main`**. The map, showcases,
+> data model, and everything below still apply here; the editorial layer is
+> additive (see **"Editorial layer"**).
 
 ## What this is
 
 **iProp** is a demo-quality web app for browsing Singapore new-launch condo
-projects. Two experiences:
+projects. On this branch it's framed as an **editorial product** with three
+destinations tied together by a macOS-style dock — built on top of two core
+experiences:
 
-1. **A 3D twilight map of Singapore** (landing page) with each development
-   shown as a stylized 3D "scale-model" you can click into.
+1. **A 3D twilight map of Singapore** with each development shown as a stylized
+   3D "scale-model" you can click into. (On `main` this is the homepage `/`; on
+   this branch it lives at `/map` and is also embedded as a teaser on Home.)
 2. **Per-project showcase pages** styled like Apple product pages / Shopify
    Editions — sleek, scroll-driven, each with its own visual identity, so
    visiting each feels like stepping into a different developer's showflat.
@@ -37,22 +46,34 @@ There are **no tests**; verification has been visual (see "Verifying changes").
 ```
 src/
   app/
-    layout.tsx                  # fonts (Playfair, Fraunces, Space Grotesk, Inter, Manrope) as CSS vars
-    page.tsx                    # renders <SingaporeMap/>
+    layout.tsx                  # fonts (Playfair, Fraunces, Space Grotesk, Inter, Manrope, Cormorant) as CSS vars; mounts <Dock/>
+    page.tsx                    # Home: hero + interactive map teaser (iframe of /map) + Featured/Latest [EDITORIAL]
+    map/page.tsx                # Explore: <SingaporeMap/> full-screen; also the Home teaser's iframe source [EDITORIAL]
+    articles/page.tsx           # Journal index: categorized bento mosaic <Journal/> [EDITORIAL]
+    articles/[slug]/page.tsx    # article reading page; mirrors projects/[slug] pattern [EDITORIAL]
     globals.css                 # Tailwind + ALL map/beacon/showcase CSS
     projects/[slug]/page.tsx    # showcase route; generateStaticParams + generateMetadata from data
   components/
     map/
-      SingaporeMap.tsx          # the whole map experience (see below)
-      MapOverlay.tsx            # brand wordmark, project list panel, region filter
-      ProjectPreviewCard.tsx    # bottom card when a project is selected
+      SingaporeMap.tsx          # the whole map experience (see below); breaks out of the teaser iframe on enter
+      MapOverlay.tsx            # brand wordmark, project list panel, region filter (raised above the dock)
+      ProjectPreviewCard.tsx    # bottom card when a project is selected (raised above the dock)
+    nav/
+      Dock.tsx                  # global macOS-style dock (Home/Explore/Journal); hides when embedded [EDITORIAL]
+    editorial/                  # the Journal/articles UI [EDITORIAL]
+      Journal.tsx               # masthead + per-category bento sections + pull-quote
+      ArticleCard.tsx           # twilight image-backed card (big? = feature treatment)
+      PullQuote.tsx             # full-bleed editorial standfirst band
+      ArticleReader.tsx         # reading-page template (hero + ArticleBlock body + "View the project" CTA)
     showcase/
-      ShowcaseRenderer.tsx      # maps project.sections[] -> section components, injects theme
+      ShowcaseRenderer.tsx      # maps project.sections[] -> section components, injects theme; renders RelatedArticles
       ShowcaseNav.tsx           # floating back-to-map / register nav
+      RelatedArticles.tsx       # theme-matched "Related reading" row (via --sc-* vars) [EDITORIAL]
       sections/                 # one component per section "type" (see data model)
   data/
     types.ts                    # Project + Theme + the Section discriminated union
-    projects.ts                 # the 8 sample projects + getProject() + formatPrice()
+    projects.ts                 # the 9 sample projects + getProject() + formatPrice()
+    articles.ts                 # editorial layer: Article/ArticleBlock/Category + helpers [EDITORIAL]
   lib/
     themes.ts                   # 4 theme presets + themeStyle() (CSS-var injection)
     towers.ts                   # procedural 3D massing geometry for the map
@@ -138,6 +159,60 @@ How it integrates:
   map's eased camera-back-out.
 - Its imagery (`cover`/`poster`/`heroImage`) is **picsum.photos** placeholder, so
   that host is whitelisted in `next.config.ts` `images.remotePatterns`.
+
+## Editorial layer (this branch)
+
+On top of the map + showcases, this branch adds an editorial product. All of it
+uses the same twilight palette and the registered font CSS vars.
+
+**Three destinations + a dock.** A global **`Dock`** (`components/nav/Dock.tsx`,
+mounted in `app/layout.tsx`) is a fixed, frosted-glass bottom pill with three
+items — **Home** (`/`), **Explore** (`/map`), **Journal** (`/articles`) — active
+state from `usePathname()`. It **hides itself when embedded** (`window.self !==
+window.top`) so it never shows inside the Home map teaser.
+
+- **Home (`/`)** — hero + an **interactive map teaser**: a rounded card with
+  `<iframe src="/map">` (the live map stays usable) + a "Explore the map →" link,
+  then **Featured** (`featuredArticles()`) and **Latest** (`latestArticles()`,
+  newest by `publishedAt`) article rows.
+- **Explore (`/map`)** — the full-screen `<SingaporeMap/>`; also the teaser's
+  iframe source.
+- **Journal (`/articles`)** — masthead + one section per `Category`
+  (**Homeowner Stories / New Launch Reviews / Property Trends**), each a
+  **deterministic bento mosaic** (`bentoTemplate(n)` in `Journal.tsx` returns a
+  literal `grid-cols-*` + per-tile span classes so any item-count tiles
+  gap-free), with a `PullQuote` band between sections.
+- **Article reading pages (`/articles/[slug]`)** — `ArticleReader` renders an
+  editorial hero + an `ArticleBlock[]` body (paragraph/subhead/quote/image) and
+  ends with a **"View the project →"** CTA to `/projects/[slug]`. Route mirrors
+  `projects/[slug]` (`generateStaticParams` + `generateMetadata`).
+
+**Iframe-breakout nav.** Because the Home teaser embeds `/map`, the map's
+"Enter showcase" handler in `SingaporeMap.tsx` navigates the **top** window when
+embedded (`window.top.location.href`) and uses `router.push` otherwise — so a
+project opened from the teaser takes the whole page, not the iframe. The
+`ProjectPreviewCard` and `MapOverlay` panel are **raised** above the dock when
+not embedded.
+
+**Data model (`src/data/articles.ts`).** A thin editorial layer over
+`projects.ts` (reuses `projects`, `getProject`, `formatPrice`, project imagery):
+- `Article` = `slug`, `category`, `headline`, `dek`, `cover`, `author`,
+  `readMins`, `date` (display) + `publishedAt` (sortable ISO), `body:
+  ArticleBlock[]`, `projectSlug` (CTA target), optional `size`.
+- `ArticleBlock` = `paragraph | subhead | quote | image` (same data-driven spirit
+  as the showcase `Section` union).
+- `CATEGORIES` (ordered, with blurbs) drives the Journal section headers.
+- Helpers: `getArticle`, `featuredArticles`, `latestArticles(n)`,
+  `categoryArticles(cat)`, and `relatedArticles(projectSlug, n)` (direct project
+  matches → same-region → most recent, deduped/capped).
+
+**Related reading on showcases.** `RelatedArticles` (`components/showcase/`) is a
+"Related reading" row styled **entirely via `--sc-*` vars**, so it adopts each
+showcase theme. Two insertion points: inside `ShowcaseRenderer` (before the
+footer, themed automatically) for the 8 standard projects, and in
+`RiverModernClient` after the scroll-film inside a wrapper that maps
+`riverModern.palette` → `--sc-*` (so it renders in River Modern's dark/Cormorant
+look).
 
 ## The map (`SingaporeMap.tsx`) — most custom part
 
@@ -239,9 +314,14 @@ basic gate.
 - No automated tests; no error monitoring; not accessibility-audited.
 - `src/**/.DS_Store` files are committed noise; safe to delete.
 
-## Suggestion for preserving this version
+## Versions / branches
 
-Before pivoting, snapshot it so it's recoverable: e.g. commit on a branch/tag
-like `prototype-v1-3d-map` (this folder is currently **not a git repo** —
-`git init` first if you want history), or copy the directory aside.
+This is a git repo (remote: `github.com/DerickYap/iprop-prototype`).
+
+- **`main`** — the original product: the standalone 3D map **as the homepage**
+  (`/` → `<SingaporeMap/>`), no editorial layer.
+- **`editorial-landing`** (this branch) — the editorial reframe described above.
+
+Switch between them with `git checkout <branch>` (your working files swap to that
+version — expected, not lost work).
 ```

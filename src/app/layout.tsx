@@ -8,6 +8,7 @@ import {
   Cormorant_Garamond,
 } from "next/font/google";
 import "./globals.css";
+import { Dock } from "@/components/nav/Dock";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -28,9 +29,9 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "iProp — Singapore New Launches in 3D",
+  title: "iProp — The Singapore New-Launch Edit",
   description:
-    "Explore Singapore's new launch condominiums on an interactive 3D map, and step inside each project's showcase.",
+    "An editorial guide to Singapore's new launch condominiums: read the stories, explore the interactive 3D map, and step inside each project's showcase.",
 };
 
 export default function RootLayout({
@@ -43,7 +44,10 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${fraunces.variable} ${grotesk.variable} ${inter.variable} ${manrope.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <Dock />
+      </body>
     </html>
   );
 }
